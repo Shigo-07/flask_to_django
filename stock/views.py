@@ -1,9 +1,10 @@
 from django.contrib import messages
 from django.shortcuts import resolve_url, render, redirect
 from django.views.generic import ListView, CreateView
+from django.views import View
 
 from stock.forms import StockPurchaseForm
-from stock.models import Stock
+from stock.models import Stock,StockPurchase
 
 
 class StockTopView(ListView):
@@ -46,3 +47,13 @@ class StockBuy(CreateView):
         context = super().get_context_data(**kwargs)
         context['stocks'] = Stock.objects.all()
         return context
+
+class StockPurchaseList(View):
+    """
+    買取リストを表示する
+    """
+
+    def get(self, request, *args, **kwargs):
+        purchase_list = StockPurchase.objects.all().select_related('stock')
+        context = {'purchase_list': purchase_list}
+        return render(request, 'stock/purchase_list.html', context)
